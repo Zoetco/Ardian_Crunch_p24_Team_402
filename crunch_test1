@@ -4,10 +4,12 @@ import pytesseract
 from pdf2image import convert_from_path
 
 # Chemin vers le fichier PDF
-pdf_path = "C:/Users/mamon/Downloads/crunch.pdf"
+pdf_path = "./fichier.pdf"
 
 # Convertir le PDF en une liste d'images
 pages = convert_from_path(pdf_path)
+
+contenu = ""
 
 # Parcourir chaque page et extraire le texte
 for i, page in enumerate(pages):
@@ -23,5 +25,45 @@ for i, page in enumerate(pages):
     # OCR avec Pytesseract
     text = pytesseract.image_to_string(threshold_img)
 
-    # Affichage du texte extrait
-    print("Page", i+1, ":", text)
+    contenu += text
+
+def extraire_paragraphe(text):
+    paragraphes = []
+    # on lit le text lettre par lettre
+    paragraphe = ""
+    for ligne in text.split("\n"):
+        # si la ligne est vide
+        if not ligne:
+            paragraphes.append(paragraphe)
+            paragraphe = ""
+            continue
+        elif ligne.endswith("."):
+            paragraphe += ligne
+            paragraphes.append(paragraphe)
+            paragraphe = ""
+        elif ligne[0].isupper():
+            if paragraphe:
+                paragraphes.append(paragraphe)
+            paragraphe = ligne
+        elif not ligne[0].isalpha() and not ligne[0].isdigit() and ligne[0] != " ":
+            if paragraphe:
+                paragraphes.append(paragraphe)
+            paragraphe = ligne
+        else:
+            paragraphe += ligne + " "
+            
+    return paragraphes
+
+paragraphes = extraire_paragraphe(contenu)
+
+# on supprime les paragraphes vides
+for paragraphe in paragraphes:
+    if not paragraphe:
+        paragraphes.remove(paragraphe)
+
+
+print(contenu)
+
+# for i, paragraphe in enumerate(paragraphes):
+#     print(paragraphe)
+#     print("\n")
