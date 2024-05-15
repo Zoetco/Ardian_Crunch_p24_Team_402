@@ -7,6 +7,7 @@ import io
 
 # pip install PyMuPDF pytesseract pillow
 
+
 def extract_text_from_image(image):
     try:
         # Utiliser Tesseract pour extraire le texte de l'image
@@ -16,6 +17,7 @@ def extract_text_from_image(image):
         print("Une erreur s'est produite lors de l'extraction du texte de l'image :", e)
         return None
 
+
 def extract_text_from_pdf(pdf_path):
     text = ""
     pdf = []
@@ -24,13 +26,13 @@ def extract_text_from_pdf(pdf_path):
         with open(pdf_path, 'rb') as pdf_file:
             # Initialiser un objet PdfReader
             pdf_reader = PyPDF2.PdfReader(pdf_file)
-            
+
             # Parcourir toutes les pages du PDF
             for page_num in range(len(pdf_reader.pages)):
                 # Extraire le texte de chaque page
                 page = pdf_reader.pages[page_num]
                 text += page.extract_text()
-                
+
                 # Extraire le texte des images de la page
                 doc = fitz.open(pdf_path)
                 page_images = doc[page_num].get_images(full=True)
@@ -40,16 +42,16 @@ def extract_text_from_pdf(pdf_path):
                     image_bytes = base_image["image"]
                     image = Image.open(io.BytesIO(image_bytes))
                     text += extract_text_from_image(image)
-                
+
                 pdf.append(text)
                 text = ""
-                
-                    
+
         return pdf
     except Exception as e:
         print("Une erreur s'est produite lors de l'extraction du texte du PDF :", e)
         return None
-    
+
+
 pdf = extract_text_from_pdf("fichier.pdf")
 
 
@@ -57,13 +59,23 @@ pdf = extract_text_from_pdf("fichier.pdf")
 client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
 
 messages = [
-    {"role": "system", "content": "Veuillez ne répondre qu'avec le PDF restructuré. Ne fournissez aucune autre mots ou phrases non présents dans le PDF original."}
+    {"role": "system", "content": "This is a conversation between Simon and blotbot a friendly chatbot. Blotbot is helpful, kind and honest. Simon is an intelligent and driven individual, but has a mild autistic disorder. Simon is often obsessed with his productivity and efficiency, wanting everything in his life to be perfectly optimized. He leaves no detail to chance and often expects others to be as efficient as he is. He is passionate about text mining in different languages."}
 ]
-
+# Veuillez ne répondre qu'avec le PDF restructuré. Ne fournissez aucune autre mots ou phrases non présents dans le PDF original."}
 
 
 # Récupérer le contenu du PDF
-content = "J'ai perdu la structure de ce PDF. Peux-tu m'aider à recréer les paragraphes de manière logique avec comme règle ultime de ne surtout pas supprimer, modifier ou traduire un seul mot? (ne réponds rien d'autre que le pdf restructutré!)\n"
+content = "The following text is unstructured, i.e. the coherence of sentences and paragraphs has been lost. I want you to restructure this text by grouping the paragraphs together, without translating anything.\n"
+# J'ai perdu la structure de ce PDF. Peux-tu m'aider à recréer les paragraphes de manière logique avec comme règle ultime de ne surtout pas supprimer, modifier ou traduire un seul mot? (ne réponds rien d'autre que le pdf restructutré!)\n"
+
+exemple = "\n \n \n OCR Challenge - May 29, 2024  \n CONFIDENTIAL  OCR Challenge  \nCRUNCH UTT 2024  \nINTRODUCTION  \nArdian est le leader européen du private equity. Fondée en 1996, l’entreprise a accumulée depuis \nsa création un très grand nombre de documents confidentiels. Dans une démarche de valorisation \nde ces documents, l’équipe IT est à la recherche d’une solution pour extraire le texte de ces \nDocuments. Pour mieux appréhender cette problématique, l’équipe stagiaire 100% UTTienne du \nprojet ArdianBrowser vous lance ce défi.  \n \nDEFI  \nEnoncé  \n« Extraire le maximum de texte brut de ce PDF, de la manière la mieux \nstructurée possible.  » \nExplication  \nLe « texte brut » ciblé est l’ensemble des mots avec le maximum de ponctuation."
+
+messages.append({"role": "user", "content": content})
+completion = client.chat.completions.create(
+    model="MaziyarPanahi/Llama-3-8B-Instruct-32k-v0.1-GGUF",
+    messages=messages,
+    temperature=0.3,  # Adjust temperature as needed
+)
 
 print(pdf)
 
@@ -86,7 +98,7 @@ for page in pdf:
 
     # Récupérer la réponse
     newPdf = completion.choices[0].message.content
-    
+
     # on enlève le message de l'utilisateur
     messages.pop(-1)
 
@@ -94,7 +106,6 @@ for page in pdf:
     for s in split:
         print(s)
         print()
-                
 
-    
+
 print(newPdf)
