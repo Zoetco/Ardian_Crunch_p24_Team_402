@@ -1,3 +1,4 @@
+from openai import OpenAI
 import PyPDF2
 import fitz
 from PIL import Image
@@ -17,6 +18,7 @@ def extract_text_from_image(image):
 
 def extract_text_from_pdf(pdf_path):
     text = ""
+    pdf = []
     try:
         # Ouvrir le fichier PDF en mode lecture binaire
         with open(pdf_path, 'rb') as pdf_file:
@@ -38,18 +40,53 @@ def extract_text_from_pdf(pdf_path):
                     image_bytes = base_image["image"]
                     image = Image.open(io.BytesIO(image_bytes))
                     text += extract_text_from_image(image)
+                
+                
                     
         return text
     except Exception as e:
         print("Une erreur s'est produite lors de l'extraction du texte du PDF :", e)
         return None
+    
+contenue = extract_text_from_pdf("fichier.pdf")
 
-# Exemple d'utilisation
-pdf_path = "./fichier.pdf"
-texte_extrait = extract_text_from_pdf(pdf_path)
-if texte_extrait:
-    print(texte_extrait)
-else:
-    print("Impossible d'extraire le texte du PDF.")
+def extraire_paragraphe(text):
+    paragraphes = []
+    # on lit le text lettre par lettre
+    paragraphe = ""
+    for ligne in text.split("\n"):
+        # si la ligne est vide
+        if not ligne:
+            paragraphes.append(paragraphe)
+            paragraphe = ""
+            continue
+        elif ligne.endswith("."):
+            paragraphe += ligne
+            paragraphes.append(paragraphe)
+            paragraphe = ""
+        elif ligne[0].isupper():
+            if paragraphe:
+                paragraphes.append(paragraphe)
+            paragraphe = ligne
+        elif not ligne[0].isalpha() and not ligne[0].isdigit() and ligne[0] != " ":
+            if paragraphe:
+                paragraphes.append(paragraphe)
+            paragraphe = ligne
+        else:
+            paragraphe += ligne + " "
+            
+    return paragraphes
+
+paragraphes = extraire_paragraphe(contenue)
+
+# on supprime les paragraphes vides
+for paragraphe in paragraphes:
+    if not paragraphe:
+        paragraphes.remove(paragraphe)
+
+for i, paragraphe in enumerate(paragraphes):
+    print(paragraphe)
+    print("-------------------------------------------------------------\n")
+
 
 
