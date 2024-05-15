@@ -7,7 +7,6 @@ from pdf2image import convert_from_path
 
 # Chemin vers le fichier PDF
 pdf_path = "./fichier.pdf"
-
 # Convertir le PDF en une liste d'images
 pages = convert_from_path(pdf_path)
 
@@ -29,16 +28,19 @@ for i, page in enumerate(pages):
 
     # OCR avec Pytesseract
     text = pytesseract.image_to_string(threshold_img)
-    pdf.append(text) 
+    pdf.append(text)
     contentPDF += text
-    
+
 
 # Point to the local server
 client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
 
 # Construire les messages pour la requête
 messages = [
-    {"role": "system", "content": "Veuillez ne répondre qu'avec le PDF restructuré. Ne fournissez aucune autre information ou détail supplémentaire."}
+    {
+        "role": "system",
+        "content": "Veuillez ne répondre qu'avec le PDF restructuré. Ne fournissez aucune autre information ou détail supplémentaire.",
+    }
 ]
 
 
@@ -62,11 +64,10 @@ for page in pdf:
 
     # Récupérer la réponse
     newPdf = completion.choices[0].message.content
-    
+
     # on enlève le message de l'utilisateur
     messages.pop(-1)
     print(newPdf)
-    
 
-    
+
 print(newPdf)
