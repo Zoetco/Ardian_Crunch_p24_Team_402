@@ -1,7 +1,7 @@
 from openai import OpenAI
-
-import cv2
-import numpy as np
+import PyPDF2
+import fitz
+from PIL import Image
 import pytesseract
 from pdf2image import convert_from_path
 
@@ -35,7 +35,6 @@ for i, page in enumerate(pages):
 # Point to the local server
 client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
 
-# Construire les messages pour la requête
 messages = [
     {
         "role": "system",
@@ -45,9 +44,13 @@ messages = [
 
 
 # Récupérer le contenu du PDF
-content = "J'ai perdu la structure de ce PDF. Peux-tu m'aider à recréer les paragraphes de manière logique avec comme règle ultime de ne surtout pas supprimer, modifier ou traduire un seul mot? (ne réponds rien d'autre que le pdf restructutré!)\n\n"
+content = "J'ai perdu la structure de ce PDF. Peux-tu m'aider à recréer les paragraphes de manière logique avec comme règle ultime de ne surtout pas supprimer, modifier ou traduire un seul mot? (ne réponds rien d'autre que le pdf restructutré!)\n"
+
+print(pdf)
+
 
 print("nombre de pages : ", len(pdf))
+
 
 newPdf = ""
 
