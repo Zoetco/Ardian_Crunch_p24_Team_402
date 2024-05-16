@@ -7,3 +7,5 @@ Pour extraire le texte d'un PDF sans utiliser un LLM, il suffit de lancer le scr
 Pour utiliser la bibliothèque pytesseract et poppler, vous devez installer les exécutables correspondants et les ajouter au chemin d'accès global de votre machine.
 pytesseract : https://tesseract-ocr.github.io/tessdoc/Installation.html
 et le zip de poppler 24.02.0 dans le GIT
+
+la vidéo de présentation : https://youtu.be/mjzSrDLXq2k
