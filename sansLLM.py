@@ -7,6 +7,7 @@ import io
 
 # pip install PyMuPDF pytesseract pillow
 
+
 def extract_text_from_image(image):
     try:
         # Utiliser Tesseract pour extraire le texte de l'image
@@ -16,21 +17,22 @@ def extract_text_from_image(image):
         print("Une erreur s'est produite lors de l'extraction du texte de l'image :", e)
         return None
 
+
 def extract_text_from_pdf(pdf_path):
     text = ""
     pdf = []
     try:
         # Ouvrir le fichier PDF en mode lecture binaire
-        with open(pdf_path, 'rb') as pdf_file:
+        with open(pdf_path, "rb") as pdf_file:
             # Initialiser un objet PdfReader
             pdf_reader = PyPDF2.PdfReader(pdf_file)
-            
+
             # Parcourir toutes les pages du PDF
             for page_num in range(len(pdf_reader.pages)):
                 # Extraire le texte de chaque page
                 page = pdf_reader.pages[page_num]
                 text += page.extract_text()
-                
+
                 # Extraire le texte des images de la page
                 doc = fitz.open(pdf_path)
                 page_images = doc[page_num].get_images(full=True)
@@ -40,15 +42,12 @@ def extract_text_from_pdf(pdf_path):
                     image_bytes = base_image["image"]
                     image = Image.open(io.BytesIO(image_bytes))
                     text += extract_text_from_image(image)
-                
-                
-                    
+
         return text
     except Exception as e:
         print("Une erreur s'est produite lors de l'extraction du texte du PDF :", e)
         return None
-    
-contenue = extract_text_from_pdf("fichier.pdf")
+
 
 def extraire_paragraphe(text):
     paragraphes = []
@@ -74,19 +73,20 @@ def extraire_paragraphe(text):
             paragraphe = ligne
         else:
             paragraphe += ligne + " "
-            
+
     return paragraphes
 
-paragraphes = extraire_paragraphe(contenue)
 
-# on supprime les paragraphes vides
-for paragraphe in paragraphes:
-    if not paragraphe:
-        paragraphes.remove(paragraphe)
+def extract_text(path):
+    contenue = extract_text_from_pdf(path)
+    paragraphes = extraire_paragraphe(contenue)
 
-for i, paragraphe in enumerate(paragraphes):
-    print(paragraphe)
-    print("-------------------------------------------------------------\n")
+    # on supprime les paragraphes vides
+    for paragraphe in paragraphes:
+        if not paragraphe:
+            paragraphes.remove(paragraphe)
+
+    return paragraphes
 
 
-
+print(extract_text("fichier.pdf"))
